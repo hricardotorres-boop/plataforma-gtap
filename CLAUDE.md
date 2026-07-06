@@ -23,8 +23,9 @@ El plan completo de desarrollo por módulos vive en [PLAN_DESARROLLO_GTAP.md](PL
 
 ## Estado del desarrollo
 
-- Módulo 0 (Cimientos): en curso.
-- Módulo 1 (Modelo de datos): pendiente.
+- Módulo 0 (Cimientos): completo. Proyecto Next.js corriendo, conectado a Supabase, primer commit hecho.
+- Módulo 1 (Modelo de datos): completo. 10 tablas migradas y verificadas contra el proyecto real de Supabase (`fvlrvpbaaxqvktcydkoq`), catálogo de temas precargado (placeholder, pendiente sustituir por el catálogo oficial completo cuando se proporcione), consulta de prueba sesiones+acuerdos verificada.
+- Nota: Supabase activa Row Level Security por defecto en tablas nuevas. Ya está activo en las 10 tablas sin políticas aún; hasta que el Módulo 2 agregue políticas, ninguna fila es visible vía la llave pública (anon), solo vía `service_role` en servidor.
 - Módulos 2 en adelante: pendientes. Ver plan para detalle y orden secuencial.
 
 ## Convenciones de código
