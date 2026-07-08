@@ -38,7 +38,8 @@ export default async function Home() {
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Sesión: {correoUsuario} · <Link href="/perfil" className="underline">Mi perfil</Link> ·{" "}
             <Link href="/sesiones" className="underline">Sesiones</Link> ·{" "}
-            <Link href="/acuerdos" className="underline">Acuerdos vivos</Link>
+            <Link href="/acuerdos" className="underline">Acuerdos vivos</Link> ·{" "}
+            <Link href="/tablero" className="underline">Tablero nacional</Link>
           </p>
         )}
       </main>

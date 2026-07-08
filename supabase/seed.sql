@@ -162,3 +162,88 @@ select
   null,
   'sin_seguimiento'
 from punto_nuevo;
+-- Tercer OOAD ficticio de prueba para el tablero
+insert into ooads (nombre, tipo, activo) values ('OOAD Prueba Centro', 'ooad', true);
+
+-- OOAD Prueba Sur: segunda sesión, con un punto de competencia central
+-- (genera su alerta) y un acuerdo vencido
+with s as (
+  insert into sesiones (ooad_id, numero_sesion, tipo, fecha, sede, quorum_certificado, estatus)
+  select id, 2, 'ordinaria', date '2026-04-15', 'Sala de juntas ficticia Sur', true, 'celebrada'
+  from ooads where nombre = 'OOAD Prueba Sur'
+  returning id
+),
+p as (
+  insert into puntos_sesion (sesion_id, tema_catalogo_id, texto_literal, orden)
+  select
+    s.id,
+    (select id from temas_catalogo where tema = 'Seguridad e Higiene' and subtema = 'Vigilar y seguimiento del presupuesto PAO (Presupuesto Anual de Operación) para la mejora de las áreas que lo requiera'),
+    'Se revisa el presupuesto PAO de la unidad ficticia Sur.',
+    1
+  from s
+  returning id, sesion_id
+)
+insert into acuerdos (sesion_id, punto_sesion_id, texto_literal, fecha_compromiso, responsable, estatus)
+select p.sesion_id, p.id, 'Se acuerda dar seguimiento al presupuesto PAO en la unidad ficticia Sur.', date '2026-05-01', 'Jefe de Recursos Materiales Sur', 'incumplido'
+from p;
+
+insert into alertas_competencia (sesion_id, punto_sesion_id, clasificacion, justificacion, cita_literal)
+select ps.sesion_id, ps.id, null,
+  'Alerta generada automáticamente: el punto coincide con un tema de competencia central. Pendiente de clasificación manual (roja/naranja).',
+  'Seguridad e Higiene / Vigilar y seguimiento del presupuesto PAO (Presupuesto Anual de Operación) para la mejora de las áreas que lo requiera'
+from puntos_sesion ps
+join sesiones se on se.id = ps.sesion_id
+join ooads o on o.id = se.ooad_id
+where o.nombre = 'OOAD Prueba Sur' and se.numero_sesion = 2;
+
+-- OOAD Prueba Centro: tres sesiones con acuerdos de distinto semáforo
+with s1 as (
+  insert into sesiones (ooad_id, numero_sesion, tipo, fecha, sede, quorum_certificado, estatus)
+  select id, 1, 'instalacion', date '2026-01-15', 'Sala de juntas ficticia Centro', true, 'celebrada'
+  from ooads where nombre = 'OOAD Prueba Centro'
+  returning id
+),
+p1 as (
+  insert into puntos_sesion (sesion_id, tema_catalogo_id, texto_literal, orden)
+  select s1.id, (select id from temas_catalogo where tema = 'Viáticos' and subtema = 'Vigilar el proceso de otorgamiento de viáticos para el pago oportuno'),
+    'Se revisa el proceso de otorgamiento de viáticos en la unidad ficticia Centro.', 1
+  from s1
+  returning id, sesion_id
+)
+insert into acuerdos (sesion_id, punto_sesion_id, texto_literal, fecha_compromiso, responsable, estatus)
+select p1.sesion_id, p1.id, 'Se acuerda agilizar el pago de viáticos en la unidad ficticia Centro.', date '2026-02-01', 'Jefe de Finanzas Centro', 'cumplido'
+from p1;
+
+with s2 as (
+  insert into sesiones (ooad_id, numero_sesion, tipo, fecha, sede, quorum_certificado, estatus)
+  select id, 2, 'ordinaria', date '2026-02-20', 'Sala de juntas ficticia Centro', false, 'celebrada'
+  from ooads where nombre = 'OOAD Prueba Centro'
+  returning id
+),
+p2 as (
+  insert into puntos_sesion (sesion_id, tema_catalogo_id, texto_literal, orden)
+  select s2.id, (select id from temas_catalogo where tema = 'Vacancia' and subtema = 'Determinar universos Prioritarios'),
+    'Se comenta la vacancia de la unidad ficticia Centro.', 1
+  from s2
+  returning id, sesion_id
+)
+insert into acuerdos (sesion_id, punto_sesion_id, texto_literal, fecha_compromiso, responsable, estatus)
+select p2.sesion_id, p2.id, 'Se acuerda analizar la vacancia en la unidad ficticia Centro; sin fecha ni responsable definido aún.', null, null, 'sin_seguimiento'
+from p2;
+
+with s3 as (
+  insert into sesiones (ooad_id, numero_sesion, tipo, fecha, sede, quorum_certificado, estatus)
+  select id, 3, 'ordinaria', date '2026-05-10', 'Sala de juntas ficticia Centro', true, 'celebrada'
+  from ooads where nombre = 'OOAD Prueba Centro'
+  returning id
+),
+p3 as (
+  insert into puntos_sesion (sesion_id, tema_catalogo_id, texto_literal, orden)
+  select s3.id, (select id from temas_catalogo where tema = 'Alimentos' and subtema = 'Supervisar el Control y calidad de los alimentos'),
+    'Se revisa la calidad de los alimentos en la unidad ficticia Centro.', 1
+  from s3
+  returning id, sesion_id
+)
+insert into acuerdos (sesion_id, punto_sesion_id, texto_literal, fecha_compromiso, responsable, estatus)
+select p3.sesion_id, p3.id, 'Se acuerda dar seguimiento a la calidad de los alimentos en la unidad ficticia Centro.', date '2026-06-01', 'Jefe de Nutrición Centro', 'vigente'
+from p3;
