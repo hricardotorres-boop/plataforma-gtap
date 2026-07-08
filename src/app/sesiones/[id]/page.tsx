@@ -3,6 +3,9 @@ import { redirect, notFound } from "next/navigation";
 import AsistenteForm from "./asistente-form";
 import PuntoForm from "./punto-form";
 import DocumentoForm from "./documento-form";
+import AcuerdoForm from "./acuerdo-form";
+import EstatusAcuerdoForm from "./estatus-acuerdo-form";
+import { semaforoAcuerdo, CLASES_SEMAFORO, ETIQUETAS_ESTATUS_ACUERDO } from "@/lib/semaforo";
 
 const ETIQUETAS_TIPO: Record<string, string> = {
   ordinaria: "Ordinaria",
@@ -67,6 +70,21 @@ export default async function DetalleSesionPage({ params }: { params: Promise<{ 
       .eq("sesion_id", id)
       .order("fecha_subida", { ascending: false }),
   ]);
+
+  const { data: acuerdosOoad } = await supabase
+    .from("acuerdos")
+    .select("id, sesion_id, texto_literal, fecha_compromiso, responsable, estatus, acuerdo_origen_id, sesiones!inner(numero_sesion, ooad_id)")
+    .eq("sesiones.ooad_id", sesion.ooad_id);
+
+  const acuerdosDeLaSesion = (acuerdosOoad ?? []).filter((a) => a.sesion_id === id);
+  const posiblesOrigenes = (acuerdosOoad ?? [])
+    .filter((a) => a.sesion_id !== id)
+    .map((a) => {
+      const s = a.sesiones as { numero_sesion: number } | { numero_sesion: number }[] | null;
+      const info = Array.isArray(s) ? s[0] : s;
+      return { id: a.id, texto_literal: a.texto_literal, numero_sesion: info?.numero_sesion ?? 0 };
+    });
+  const mapaAcuerdos = new Map((acuerdosOoad ?? []).map((a) => [a.id, a]));
 
   const ooad = sesion.ooads as { nombre: string } | { nombre: string }[] | null;
   const nombreOoad = Array.isArray(ooad) ? ooad[0]?.nombre : ooad?.nombre;
@@ -137,6 +155,58 @@ export default async function DetalleSesionPage({ params }: { params: Promise<{ 
             )}
           </ol>
           {puedeEscribir && <PuntoForm sesionId={id} temas={temas ?? []} />}
+        </section>
+
+        <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+          <h2 className="mb-3 font-semibold text-black dark:text-zinc-50">Acuerdos</h2>
+          <ul className="mb-4 flex flex-col gap-3 text-sm">
+            {acuerdosDeLaSesion.length ? (
+              acuerdosDeLaSesion.map((a) => {
+                const color = semaforoAcuerdo(a.estatus, a.fecha_compromiso);
+                const origen = a.acuerdo_origen_id ? mapaAcuerdos.get(a.acuerdo_origen_id) : null;
+                const origenSesionInfo = origen
+                  ? (Array.isArray(origen.sesiones) ? origen.sesiones[0] : origen.sesiones)
+                  : null;
+                const seguidoPor = (acuerdosOoad ?? []).find((otro) => otro.acuerdo_origen_id === a.id);
+                const seguidoPorSesionInfo = seguidoPor
+                  ? (Array.isArray(seguidoPor.sesiones) ? seguidoPor.sesiones[0] : seguidoPor.sesiones)
+                  : null;
+                return (
+                  <li key={a.id} className="rounded border border-zinc-200 p-2 dark:border-zinc-800">
+                    <div className="flex items-start gap-2">
+                      <span className={`mt-1 inline-block h-2 w-2 shrink-0 rounded-full ${CLASES_SEMAFORO[color]}`} />
+                      <div>
+                        <p>{a.texto_literal}</p>
+                        <p className="text-zinc-600 dark:text-zinc-400">
+                          Fecha compromiso: {a.fecha_compromiso ?? "no verificable"} · Responsable: {a.responsable ?? "no verificable"} · Estatus: {ETIQUETAS_ESTATUS_ACUERDO[a.estatus] ?? a.estatus}
+                        </p>
+                        {origen && (
+                          <p className="text-zinc-600 dark:text-zinc-400">
+                            Da seguimiento a: Sesión {origenSesionInfo?.numero_sesion} — {origen.texto_literal.slice(0, 60)}
+                          </p>
+                        )}
+                        {seguidoPor && (
+                          <p className="text-zinc-600 dark:text-zinc-400">
+                            Seguido en: Sesión {seguidoPorSesionInfo?.numero_sesion} — {seguidoPor.texto_literal.slice(0, 60)}
+                          </p>
+                        )}
+                        {puedeEscribir && <EstatusAcuerdoForm acuerdoId={a.id} sesionId={id} />}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })
+            ) : (
+              <li className="text-zinc-600 dark:text-zinc-400">Sin acuerdos registrados.</li>
+            )}
+          </ul>
+          {puedeEscribir && (
+            <AcuerdoForm
+              sesionId={id}
+              puntos={(puntos ?? []).map((p) => ({ id: p.id, texto_literal: p.texto_literal }))}
+              posiblesOrigenes={posiblesOrigenes}
+            />
+          )}
         </section>
 
         <section className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
