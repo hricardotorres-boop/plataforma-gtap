@@ -36,7 +36,8 @@ export default async function Home() {
         </p>
         {correoUsuario && (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Sesión: {correoUsuario} · <Link href="/perfil" className="underline">Mi perfil</Link>
+            Sesión: {correoUsuario} · <Link href="/perfil" className="underline">Mi perfil</Link> ·{" "}
+            <Link href="/sesiones" className="underline">Sesiones</Link>
           </p>
         )}
       </main>
