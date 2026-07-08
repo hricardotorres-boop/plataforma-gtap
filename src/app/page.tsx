@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 
 export default async function Home() {
   const supabaseConfigurado =
@@ -6,14 +7,19 @@ export default async function Home() {
     !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   let estadoConexion = "Sin configurar (.env.local vacío)";
+  let correoUsuario: string | null = null;
 
   if (supabaseConfigurado) {
     try {
       const supabase = await createClient();
-      const { error } = await supabase.auth.getSession();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
       estadoConexion = error
         ? `Error de conexión: ${error.message}`
         : "Conectado a Supabase";
+      correoUsuario = user?.email ?? null;
     } catch (err) {
       estadoConexion = `Error de conexión: ${(err as Error).message}`;
     }
@@ -28,6 +34,11 @@ export default async function Home() {
         <p className="text-lg text-zinc-600 dark:text-zinc-400">
           Estado de Supabase: {estadoConexion}
         </p>
+        {correoUsuario && (
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Sesión: {correoUsuario} · <Link href="/perfil" className="underline">Mi perfil</Link>
+          </p>
+        )}
       </main>
     </div>
   );

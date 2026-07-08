@@ -23,10 +23,10 @@ El plan completo de desarrollo por módulos vive en [PLAN_DESARROLLO_GTAP.md](PL
 
 ## Estado del desarrollo
 
-- Módulo 0 (Cimientos): completo. Proyecto Next.js corriendo, conectado a Supabase, primer commit hecho.
-- Módulo 1 (Modelo de datos): completo. 10 tablas migradas y verificadas contra el proyecto real de Supabase (`fvlrvpbaaxqvktcydkoq`), catálogo de temas precargado (placeholder, pendiente sustituir por el catálogo oficial completo cuando se proporcione), consulta de prueba sesiones+acuerdos verificada.
-- Nota: Supabase activa Row Level Security por defecto en tablas nuevas. Ya está activo en las 10 tablas sin políticas aún; hasta que el Módulo 2 agregue políticas, ninguna fila es visible vía la llave pública (anon), solo vía `service_role` en servidor.
-- Módulos 2 en adelante: pendientes. Ver plan para detalle y orden secuencial.
+- Módulo 0 (Cimientos): completo. Proyecto Next.js corriendo, conectado a Supabase, primer commit hecho. Código en GitHub: `hricardotorres-boop/plataforma-gtap` (privado).
+- Módulo 1 (Modelo de datos): completo. 10 tablas migradas y verificadas contra el proyecto real de Supabase (`fvlrvpbaaxqvktcydkoq`). Catálogo oficial de temas cargado (18 temas, 64 subtemas, fuente: documento "TEMAS DELEGACIONAL NIVEL OOAD" proporcionado por el usuario; el documento aclara que no es limitativo), consulta de prueba sesiones+acuerdos verificada.
+- Módulo 2 (Autenticación y RLS): completo. Políticas RLS activas en las 10 tablas según la matriz de permisos del plan (`admin_central`, `analista_central`, `usuario_ooad`, `consulta`). Trigger de creación automática de perfil al registrarse (rol `consulta` por defecto) y trigger que bloquea auto-elevación de rol/ooad_id (solo `admin_central` puede cambiarlos). Pantallas de login, registro, recuperación de contraseña y perfil en Next.js con `@supabase/ssr`, middleware protege todas las rutas salvo las de auth. Verificado con 4 usuarios ficticios (uno por rol): el usuario_ooad de OOAD Prueba Norte no puede leer ni escribir la sesión de OOAD Prueba Sur ni por API directa (RLS lo bloquea silenciosamente).
+- Módulos 3 en adelante: pendientes. Ver plan para detalle y orden secuencial.
 
 ## Convenciones de código
 
