@@ -86,6 +86,51 @@ insert into temas_catalogo (tema, subtema, competencia) values
 
   ('Trato digno', 'Dar seguimiento', 'ooad');
 
+-- Catálogo oficial de OOAD por región y sección sindical (números romanos).
+-- Fuente: "Catalogo de OOAD y Sección por Region.xlsx" proporcionado por el
+-- usuario. Se mantiene aparte de los OOAD ficticios de prueba de abajo.
+insert into ooads (nombre, tipo, region, seccion_sntss, activo) values
+  ('AGUASCALIENTES', 'ooad', 'NORTE', 'XXI', true),
+  ('CHIHUAHUA', 'ooad', 'NORTE', 'VIII', true),
+  ('COAHUILA', 'ooad', 'NORTE', 'XII', true),
+  ('DURANGO', 'ooad', 'NORTE', 'XVI', true),
+  ('NUEVO LEON', 'ooad', 'NORTE', 'II', true),
+  ('SAN LUIS POTOSI', 'ooad', 'NORTE', 'XVIII', true),
+  ('TAMAULIPAS', 'ooad', 'NORTE', 'X', true),
+  ('ZACATECAS', 'ooad', 'NORTE', 'VIII', true),
+
+  ('BAJA CALIFORNIA', 'ooad', 'OCCIDENTE', 'VII', true),
+  ('BAJA CALIFORNIA SUR', 'ooad', 'OCCIDENTE', 'XXXI', true),
+  ('COLIMA', 'ooad', 'OCCIDENTE', 'XXV', true),
+  ('JALISCO', 'ooad', 'OCCIDENTE', 'III', true),
+  ('MICHOACÁN', 'ooad', 'OCCIDENTE', 'XX', true),
+  ('NAYARIT', 'ooad', 'OCCIDENTE', 'XXIV', true),
+  ('SINALOA', 'ooad', 'OCCIDENTE', 'XI', true),
+  ('SONORA', 'ooad', 'OCCIDENTE', 'XIII', true),
+
+  ('CAMPECHE', 'ooad', 'SUR', 'XXVII', true),
+  ('CHIAPAS', 'ooad', 'SUR', 'XIV', true),
+  ('OAXACA', 'ooad', 'SUR', 'XXVIII', true),
+  ('QUINTANA ROO', 'ooad', 'SUR', 'XXXVI', true),
+  ('TABASCO', 'ooad', 'SUR', 'XXVI', true),
+  ('VERACRUZ NORTE', 'ooad', 'SUR', 'IX', true),
+  ('VERACRUZ SUR', 'ooad', 'SUR', 'IV', true),
+  ('YUCATÁN', 'ooad', 'SUR', 'VI', true),
+
+  ('DF NORTE', 'ooad', 'CENTRO', 'XXXII', true),
+  ('DF NORTE', 'ooad', 'CENTRO', 'XXXIII', true),
+  ('DF SUR', 'ooad', 'CENTRO', 'XXXIV', true),
+  ('DF SUR', 'ooad', 'CENTRO', 'XXXV', true),
+  ('GUANAJUATO', 'ooad', 'CENTRO', 'XV', true),
+  ('GUERRERO', 'ooad', 'CENTRO', 'XVII', true),
+  ('HIDALGO', 'ooad', 'CENTRO', 'XXII', true),
+  ('MÉXICO ORIENTE', 'ooad', 'CENTRO', 'V', true),
+  ('MÉXICO PONIENTE', 'ooad', 'CENTRO', 'XXXVII', true),
+  ('MORELOS', 'ooad', 'CENTRO', 'XIX', true),
+  ('PUEBLA', 'ooad', 'CENTRO', 'I', true),
+  ('QUERÉTARO', 'ooad', 'CENTRO', 'XXIII', true),
+  ('TLAXCALA', 'ooad', 'CENTRO', 'XXX', true);
+
 -- OOAD ficticios para pruebas de sesiones, acuerdos y (en el Módulo 2) RLS
 insert into ooads (nombre, tipo, activo) values
   ('OOAD Prueba Norte', 'ooad', true),
