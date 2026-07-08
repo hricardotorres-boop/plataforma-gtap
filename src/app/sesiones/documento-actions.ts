@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
+import { extraerCandidatosOrdenDia } from "@/lib/extraccion-texto";
 
 function bucketDeTipo(tipo: string) {
   if (tipo === "acta" || tipo === "anexo") return "actas";
@@ -10,7 +11,11 @@ function bucketDeTipo(tipo: string) {
   return "fichas";
 }
 
-export async function subirDocumento(sesionId: string, _prevState: { error?: string; ok?: boolean } | null, formData: FormData) {
+export async function subirDocumento(
+  sesionId: string,
+  _prevState: { error?: string; ok?: boolean; candidatos?: string[] } | null,
+  formData: FormData,
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -77,6 +82,52 @@ export async function subirDocumento(sesionId: string, _prevState: { error?: str
       registro_id: sustituyeA,
       detalle: { sustituido_por: documentoId },
     });
+  }
+
+  revalidatePath(`/sesiones/${sesionId}`);
+
+  if (tipo === "acta") {
+    const candidatos = await extraerCandidatosOrdenDia(archivo);
+    if (candidatos.length) {
+      return { ok: true, candidatos };
+    }
+  }
+
+  return { ok: true };
+}
+
+export async function confirmarPuntosOrdenDia(
+  sesionId: string,
+  _prevState: { error?: string; ok?: boolean } | null,
+  formData: FormData,
+) {
+  const supabase = await createClient();
+
+  const textos = formData.getAll("punto_texto") as string[];
+  const seleccionados = formData.getAll("punto_incluido") as string[];
+
+  const textosAInsertar = textos.filter((_, i) => seleccionados.includes(String(i))).filter((t) => t.trim() !== "");
+
+  if (!textosAInsertar.length) {
+    return { error: "No seleccionaste ningún punto" };
+  }
+
+  const { count } = await supabase
+    .from("puntos_sesion")
+    .select("id", { count: "exact", head: true })
+    .eq("sesion_id", sesionId);
+
+  const base = count ?? 0;
+  const { error } = await supabase.from("puntos_sesion").insert(
+    textosAInsertar.map((texto, i) => ({
+      sesion_id: sesionId,
+      texto_literal: texto.trim(),
+      orden: base + i + 1,
+    })),
+  );
+
+  if (error) {
+    return { error: error.message };
   }
 
   revalidatePath(`/sesiones/${sesionId}`);

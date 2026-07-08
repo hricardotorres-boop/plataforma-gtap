@@ -5,6 +5,7 @@ import PuntoForm from "./punto-form";
 import DocumentoForm from "./documento-form";
 import AcuerdoForm from "./acuerdo-form";
 import EstatusAcuerdoForm from "./estatus-acuerdo-form";
+import ReporteBoton from "./reporte-boton";
 import { semaforoAcuerdo, CLASES_SEMAFORO, ETIQUETAS_ESTATUS_ACUERDO } from "@/lib/semaforo";
 
 const ETIQUETAS_TIPO: Record<string, string> = {
@@ -231,6 +232,11 @@ export default async function DetalleSesionPage({ params }: { params: Promise<{ 
               sesionId={id}
               documentosVigentes={(documentos ?? []).filter((d) => d.vigente).map((d) => ({ id: d.id, nombre_archivo: d.nombre_archivo, tipo: d.tipo }))}
             />
+          )}
+          {puedeEscribir && (
+            <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+              <ReporteBoton sesionId={id} />
+            </div>
           )}
         </section>
       </div>
